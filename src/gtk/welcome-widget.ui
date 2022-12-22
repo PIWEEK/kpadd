@@ -1,0 +1,227 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<interface>
+  <template class="KpaddWelcomeWidget">
+    <property name="layout-manager">
+		  <object class="GtkBoxLayout">
+			  <property name="orientation">vertical</property>
+			  <property name="spacing">32</property>
+		  </object>
+	  </property>
+    <child>
+      <object class="GtkGrid" id="grid">
+        <property name="hexpand">true</property>
+        <property name="vexpand">true</property>
+        <property name="row-spacing">48</property>
+        <property name="column-spacing">32</property>
+        <child>
+
+          <object class="GtkBox">
+            <property name="orientation">vertical</property>
+            <property name="spacing">4</property>
+            <layout>
+              <property name="column">0</property>
+              <property name="row">0</property>
+            </layout>
+            <child>
+             <object class="GtkLabel" id="dateDayName">
+                <property name="label">Monday</property>
+                <property name="halign">start</property>
+                <style>
+                  <class name="date-day-name"/>
+                </style>
+              </object>
+            </child>
+            <child>
+              <object class="GtkLabel" id="dateYMD">
+                <property name="label">16 May 2021</property>
+                <property name="halign">start</property>
+                <style>
+                  <class name="date-ymd"/>
+                </style>
+              </object>
+            </child>
+          </object>
+        </child>
+        <child>
+          <object class="GtkGrid" id="weatherGrid">
+            <property name="row-spacing">4</property>
+            <property name="column-spacing">8</property>
+            <child>
+              <object class="GtkImage" id="weatherIcon">
+                <property name="icon_name">weather-clear-symbolic</property>
+                <property name="pixel_size">48</property>
+                <layout>
+                    <property name="column">0</property>
+                    <property name="row">0</property>
+                    <property name="row-span">2</property>
+                  </layout>
+              </object>
+            </child>
+            <child>
+              <object class="GtkLabel" id="weatherCode">
+                <property name="label">Mostly Sunny</property>
+                <style>
+                  <class name="weather-code"/>
+                </style>
+                <layout>
+                  <property name="column">1</property>
+                  <property name="row">0</property>
+                </layout>
+              </object>
+            </child>
+            <child>
+              <object class="GtkBox">
+                <property name="orientation">horizontal</property>
+                <property name="spacing">4</property>
+                <layout>
+                  <property name="column">1</property>
+                  <property name="row">1</property>
+                </layout>
+                <child>
+                  <object class="GtkLabel" id="weatherMax">
+                    <property name="label">0</property>
+                    <property name="halign">start</property>
+                    <style>
+                      <class name="weather-max"/>
+                    </style>
+                  </object>
+                </child>
+                <child>
+                  <object class="GtkLabel" id="weatherMin">
+                    <property name="label">0</property>
+                    <property name="halign">start</property>
+                    <style>
+                      <class name="weather-min"/>
+                    </style>
+                  </object>
+                </child>
+              </object>
+            </child>
+          </object>
+
+        </child>
+        <child>
+          <object class="GtkCalendar" id="calendar">
+            <property name="visible">True</property>
+            <property name="can_focus">True</property>
+            <layout>
+              <property name="column">0</property>
+              <property name="row">1</property>
+            </layout>
+          </object>
+        </child>
+        <child>
+          <object class="GtkBox" id="agenda">
+            <property name="orientation">vertical</property>
+            <property name="hexpand">true</property>
+            <property name="spacing">16</property>
+            <child>
+              <object class="GtkLabel">
+                <property name="label">Agenda</property>
+                <property name="halign">start</property>
+                <style>
+                  <class name="title-4"/>
+                </style>
+              </object>
+            </child>
+            <child>
+              <object class="GtkBox">
+                <property name="orientation">horizontal</property>
+                <property name="hexpand">true</property>
+                <property name="spacing">16</property>
+                <child>
+                  <object class="GtkLabel">
+                    <property name="label">14:00</property>
+                    <property name="halign">start</property>
+                  </object>
+                </child>
+                <child>
+                  <object class="GtkLabel">
+                    <property name="label">Expandables with Kate</property>
+                    <property name="halign">start</property>
+                  </object>
+                </child>
+              </object>
+            </child>
+            <child>
+              <object class="GtkBox">
+                <property name="orientation">horizontal</property>
+                <property name="hexpand">true</property>
+                <property name="spacing">16</property>
+                <child>
+                  <object class="GtkLabel">
+                    <property name="label">15:00</property>
+                    <property name="halign">start</property>
+                  </object>
+                </child>
+                <child>
+                  <object class="GtkLabel">
+                    <property name="label">Appointment</property>
+                    <property name="halign">start</property>
+                  </object>
+                </child>
+              </object>
+            </child>
+            <child>
+              <object class="GtkBox">
+                <property name="orientation">horizontal</property>
+                <property name="hexpand">true</property>
+                <property name="spacing">16</property>
+                <child>
+                  <object class="GtkLabel">
+                    <property name="label">16:00</property>
+                    <property name="halign">start</property>
+                  </object>
+                </child>
+                <child>
+                  <object class="GtkLabel">
+                    <property name="label">PIWEEK Micdrop</property>
+                    <property name="halign">start</property>
+                  </object>
+                </child>
+              </object>
+            </child>
+            <layout>
+              <property name="column">1</property>
+              <property name="row">1</property>
+            </layout>
+          </object>
+        </child>
+        <child>
+          <object class="GtkBox" id="notes">
+            <property name="orientation">vertical</property>
+            <property name="spacing">16</property>
+            <style>
+              <class name="notes"/>
+            </style>
+            <child>
+              <object class="GtkLabel">
+                <property name="label">Notes</property>
+                <property name="halign">start</property>
+                <style>
+                  <class name="title-4"/>
+                </style>
+              </object>
+            </child>
+            <child>
+              <object class="GtkScrolledWindow">
+                <property name="hexpand">true</property>
+                <property name="vexpand">true</property>
+                <property name="child">
+                  <object class="GtkTextView" id="mainTextView">
+                    <property name="monospace">true</property>
+                  </object>
+                </property>
+              </object>
+            </child>
+            <layout>
+              <property name="column">0</property>
+              <property name="row">2</property>
+              <property name="column-span">2</property>
+            </layout>
+          </object>
+        </child>
+      </object>
+    </child>
+	</template>
+</interface>

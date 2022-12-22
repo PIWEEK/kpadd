@@ -1,0 +1,59 @@
+stacksidebar {
+  background-color: #ffffff;
+}
+
+/* Welcome */
+
+welcome {
+  padding: 1rem;
+}
+
+/* CALENDAR */
+
+.date-day-name {
+  font-weight: bold;
+  font-size: larger;
+}
+
+.date-ymd {
+  font-weight: bold;
+  font-size: x-large;
+}
+
+calendar > grid > label:selected {
+  background-color: #8ff0a4;
+  color: #26a269;
+  font-weight: bold;
+}
+
+/* WEATHER */
+
+.weather-max,
+.weather-code {
+  font-weight: 600;
+}
+
+.weather-max,
+.weather-min {
+  font-size: small;
+}
+
+box.notes {
+  margin-top: 1.75rem;
+}
+
+textview {
+  padding: 1rem;
+}
+
+/* Github */
+
+.github-layout {
+  margin: 2rem;
+}
+
+/* Taiga */
+
+.taiga-layout {
+  margin: 2rem;
+}

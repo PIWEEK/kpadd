@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gresources>
+  <gresource prefix="/net/kaleidos/kpadd/js">
+    <file>main.js</file>
+    <file>window.js</file>
+    <file>welcome-widget.js</file>
+    <file>github-widget.js</file>
+    <file>taiga-widget.js</file>
+    <file>config/config.js</file>
+  </gresource>
+</gresources>

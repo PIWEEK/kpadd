@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gresources>
+  <gresource prefix="/net/kaleidos/kpadd">
+    <file>css/style.css</file>
+    <file preprocess="xml-stripblanks">window.ui</file>
+    <file preprocess="xml-stripblanks">gtk/help-overlay.ui</file>
+    <file preprocess="xml-stripblanks">gtk/welcome-widget.ui</file>
+    <file preprocess="xml-stripblanks">gtk/github-widget.ui</file>
+    <file preprocess="xml-stripblanks">gtk/taiga-widget.ui</file>
+  </gresource>
+</gresources>

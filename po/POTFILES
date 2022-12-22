@@ -1,0 +1,6 @@
+data/net.kaleidos.kpadd.desktop.in
+data/net.kaleidos.kpadd.appdata.xml.in
+data/net.kaleidos.kpadd.gschema.xml
+src/main.js
+src/window.js
+src/window.ui

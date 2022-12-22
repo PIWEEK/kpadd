@@ -1,0 +1,8 @@
+[Desktop Entry]
+Name=kpadd
+Exec=net.kaleidos.kpadd
+Icon=net.kaleidos.kpadd
+Terminal=false
+Type=Application
+Categories=GTK;
+StartupNotify=true
