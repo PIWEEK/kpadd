@@ -1,11 +1,11 @@
 import GObject from "gi://GObject";
 import Gtk from "gi://Gtk";
 import GLib from "gi://GLib";
-import Soup from "gi://Soup?version=3.0";
+import Soup from "gi://Soup?version=2.4";
 import Adw from "gi://Adw";
 import Gio from "gi://Gio";
 
-import { taigaUser } from "./config/config";
+import { taigaUser } from "./config/config.js";
 
 export const TaigaWidget = GObject.registerClass(
   {
@@ -26,10 +26,9 @@ export const TaigaWidget = GObject.registerClass(
 
       const session = new Soup.Session();
       const url = `https://api.taiga.io/api/v1/auth`;
-      const uri = GLib.Uri.parse(url, GLib.UriFlags.NONE);
       const message = new Soup.Message({
         method: "POST",
-        uri,
+        uri: new Soup.URI(url),
       });
       const authData = JSON.stringify({
         password: taigaUser.password,
@@ -38,90 +37,89 @@ export const TaigaWidget = GObject.registerClass(
       });
 
       message.request_headers.append("Content-Type", "application/json");
-      message.set_request_body(authData, null, null);
-      const bytes = session.send_and_read(message, null);
-      const decoder = new TextDecoder("utf-8");
-      const result = decoder.decode(bytes.get_data());
-      const auth = JSON.parse(result);
+      message.request_body.append(authData);
 
-      console.log({ auth });
+      session.queue_message(message, (session, message) => {
+        const data = JSON.parse(message.response_body.data);
+        // console.log(data);
+
+        this.getTasks(data);
+      });
     }
 
-    // #getPullRequests() {
-    //   console.log("get PRS!");
+    getTasks(data) {
+      const session = new Soup.Session();
+      // const url = `https://api.taiga.io/api/v1/userstories?assigned_users=${data.id}&dashboard=true&is_closed=false`;
+      // const url = `https://  api.taiga.io/api/v1/tasks?assigned_to=${data.id}&status__is_closed=false`;
+      const url = `https://api.taiga.io/api/v1/issues?assigned_to=${data.id}&status__is_closed=false`;
+      const message = new Soup.Message({
+        method: "GET",
+        uri: new Soup.URI(url),
+      });
+      message.request_headers.append("Content-Type", "application/json");
+      message.request_headers.append(
+        "Authorization",
+        `Bearer ${data.auth_token}`
+      );
 
-    //   const session = new Soup.Session();
-    //   const url = `https://api.github.com/repos/taigaio/taiga-back/pulls`;
-    //   const uri = GLib.Uri.parse(url, GLib.UriFlags.NONE);
-    //   const message = new Soup.Message({
-    //     method: "GET",
-    //     uri,
-    //   });
+      session.queue_message(message, (session, message) => {
+        const data = JSON.parse(message.response_body.data);
 
-    //   message.request_headers.append(
-    //     "Authorization",
-    //     "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"
-    //   );
+        this.displayTasks(data);
+      });
+    }
 
-    //   message.request_headers.append("User-Agent", "Kpadd/0.1");
-    //   message.request_headers.append("Accept", "application/vnd.github+json");
-    //   message.request_headers.append("X-GitHub-Api-Version", "2022-11-28");
+    displayTasks(data) {
+      data.forEach((item) => {
+        const avatar = new Adw.Avatar({
+          text: item.project_extra_info.name,
+          show_initials: true,
+          size: 32,
+        });
 
-    //   const bytes = session.send_and_read(message, null);
-    //   const decoder = new TextDecoder("utf-8");
-    //   const result = decoder.decode(bytes.get_data());
-    //   const data = JSON.parse(result);
+        let ctaButton = new Gtk.LinkButton({
+          css_classes: ["flat"],
+          uri: `https://tree.taiga.io/project/${item.project_extra_info.slug}/task/${item.id}`,
+          child: new Adw.ButtonContent({
+            icon_name: "checkbox-checked-symbolic",
+            label: _("Visit"),
+          }),
+        });
 
-    //   data.forEach((item) => {
-    //     let PRCreateDateTime = GLib.DateTime.new_from_iso8601(
-    //       item.created_at,
-    //       null
-    //     );
-    //     let currentDateTime = GLib.DateTime.new_now_local();
-    //     let milli = Math.abs(
-    //       PRCreateDateTime.difference(currentDateTime) / 1000
-    //     );
-    //     const diffDate = this.getDuration(milli);
+        let PRCreateDateTime = GLib.DateTime.new_from_iso8601(
+          item.created_date,
+          null
+        );
+        let currentDateTime = GLib.DateTime.new_now_local();
+        let milli = Math.abs(
+          PRCreateDateTime.difference(currentDateTime) / 1000
+        );
+        const diffDate = this.getDuration(milli);
 
-    //     const avatar = new Adw.Avatar({
-    //       text: item.user.login,
-    //       show_initials: true,
-    //       size: 32,
-    //     });
+        const wrapperBox = new Adw.ActionRow({
+          title: item.subject,
+          subtitle: `#${item.ref} created by ${item.owner_extra_info.full_name_display} in ${item.project_extra_info.name} ${diffDate.value} ${diffDate.unit} ago`,
+        });
 
-    //     let ctaButton = new Gtk.LinkButton({
-    //       css_classes: ["flat"],
-    //       uri: item.html_url,
-    //       child: new Adw.ButtonContent({
-    //         icon_name: "view-dual-symbolic",
-    //         label: _("Review"),
-    //       }),
-    //     });
+        wrapperBox.add_suffix(ctaButton);
+        wrapperBox.add_prefix(avatar);
 
-    //     const wrapperBox = new Adw.ActionRow({
-    //       title: item.title,
-    //       subtitle: `#${item.number} by ${item.user.login} in ${item.base.repo.name} ${diffDate.value} ${diffDate.unit} ago`,
-    //     });
+        this._tasks.append(wrapperBox);
+      });
+    }
 
-    //     wrapperBox.add_suffix(ctaButton);
-    //     wrapperBox.add_prefix(avatar);
+    getDuration(milli) {
+      let minutes = Math.floor(milli / 60000);
+      let hours = Math.round(minutes / 60);
+      let days = Math.round(hours / 24);
 
-    //     this._pullRequests.append(wrapperBox);
-    //   });
-    // }
-
-    // getDuration(milli) {
-    //   let minutes = Math.floor(milli / 60000);
-    //   let hours = Math.round(minutes / 60);
-    //   let days = Math.round(hours / 24);
-
-    //   return (
-    //     (days && { value: days, unit: "days" }) ||
-    //     (hours && { value: hours, unit: "hours" }) || {
-    //       value: minutes,
-    //       unit: "minutes",
-    //     }
-    //   );
-    // }
+      return (
+        (days && { value: days, unit: "days" }) ||
+        (hours && { value: hours, unit: "hours" }) || {
+          value: minutes,
+          unit: "minutes",
+        }
+      );
+    }
   }
 );

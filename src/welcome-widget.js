@@ -1,7 +1,7 @@
 import GObject from "gi://GObject";
 import Gtk from "gi://Gtk";
 import GLib from "gi://GLib";
-import Soup from "gi://Soup?version=3.0";
+import Soup from "gi://Soup?version=2.4";
 
 export const WelcomeWidget = GObject.registerClass(
   {
@@ -42,20 +42,21 @@ export const WelcomeWidget = GObject.registerClass(
       const session = new Soup.Session();
       const url =
         "https://api.open-meteo.com/v1/forecast?latitude=40.60&longitude=-3.71&daily=weathercode,temperature_2m_max,temperature_2m_min&current_weather=true&timezone=Europe%2FBerlin";
-      const uri = GLib.Uri.parse(url, GLib.UriFlags.NONE);
+      // const uri = GLib.Uri.parse(url, GLib.UriFlags.NONE);
+
       const message = new Soup.Message({
         method: "GET",
-        uri,
+        uri: new Soup.URI(url),
       });
+      // message.request_headers.append("Content-Type", "application/json");
 
-      const bytes = session.send_and_read(message, null);
-      const decoder = new TextDecoder("utf-8");
-      const result = decoder.decode(bytes.get_data());
-      const data = JSON.parse(result);
+      session.queue_message(message, (session, message) => {
+        const data = JSON.parse(message.response_body.data);
 
-      this.setMaxWeather(data.daily.temperature_2m_max);
-      this.setMinWeather(data.daily.temperature_2m_min);
-      this.setWeatherDescription(data.current_weather.weathercode);
+        this.setMaxWeather(data.daily.temperature_2m_max);
+        this.setMinWeather(data.daily.temperature_2m_min);
+        this.setWeatherDescription(data.current_weather.weathercode);
+      });
     }
 
     setMaxWeather(maxWeatherList) {

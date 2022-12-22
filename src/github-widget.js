@@ -1,7 +1,7 @@
 import GObject from "gi://GObject";
 import Gtk from "gi://Gtk";
 import GLib from "gi://GLib";
-import Soup from "gi://Soup?version=3.0";
+import Soup from "gi://Soup?version=2.4";
 import Adw from "gi://Adw";
 import Gio from "gi://Gio";
 
@@ -22,10 +22,10 @@ export const GithubWidget = GObject.registerClass(
     #getPullRequests() {
       const session = new Soup.Session();
       const url = `https://api.github.com/repos/taigaio/taiga-back/pulls`;
-      const uri = GLib.Uri.parse(url, GLib.UriFlags.NONE);
+
       const message = new Soup.Message({
         method: "GET",
-        uri,
+        uri: new Soup.URI(url),
       });
 
       message.request_headers.append(
@@ -37,46 +37,44 @@ export const GithubWidget = GObject.registerClass(
       message.request_headers.append("Accept", "application/vnd.github+json");
       message.request_headers.append("X-GitHub-Api-Version", "2022-11-28");
 
-      const bytes = session.send_and_read(message, null);
-      const decoder = new TextDecoder("utf-8");
-      const result = decoder.decode(bytes.get_data());
-      const data = JSON.parse(result);
+      session.queue_message(message, (session, message) => {
+        const data = JSON.parse(message.response_body.data);
+        data.forEach((item) => {
+          let PRCreateDateTime = GLib.DateTime.new_from_iso8601(
+            item.created_at,
+            null
+          );
+          let currentDateTime = GLib.DateTime.new_now_local();
+          let milli = Math.abs(
+            PRCreateDateTime.difference(currentDateTime) / 1000
+          );
+          const diffDate = this.getDuration(milli);
 
-      data.forEach((item) => {
-        let PRCreateDateTime = GLib.DateTime.new_from_iso8601(
-          item.created_at,
-          null
-        );
-        let currentDateTime = GLib.DateTime.new_now_local();
-        let milli = Math.abs(
-          PRCreateDateTime.difference(currentDateTime) / 1000
-        );
-        const diffDate = this.getDuration(milli);
+          const avatar = new Adw.Avatar({
+            text: item.user.login,
+            show_initials: true,
+            size: 32,
+          });
 
-        const avatar = new Adw.Avatar({
-          text: item.user.login,
-          show_initials: true,
-          size: 32,
+          let ctaButton = new Gtk.LinkButton({
+            css_classes: ["flat"],
+            uri: item.html_url,
+            child: new Adw.ButtonContent({
+              icon_name: "view-dual-symbolic",
+              label: _("Review"),
+            }),
+          });
+
+          const wrapperBox = new Adw.ActionRow({
+            title: item.title,
+            subtitle: `#${item.number} by ${item.user.login} in ${item.base.repo.name} ${diffDate.value} ${diffDate.unit} ago`,
+          });
+
+          wrapperBox.add_suffix(ctaButton);
+          wrapperBox.add_prefix(avatar);
+
+          this._pullRequests.append(wrapperBox);
         });
-
-        let ctaButton = new Gtk.LinkButton({
-          css_classes: ["flat"],
-          uri: item.html_url,
-          child: new Adw.ButtonContent({
-            icon_name: "view-dual-symbolic",
-            label: _("Review"),
-          }),
-        });
-
-        const wrapperBox = new Adw.ActionRow({
-          title: item.title,
-          subtitle: `#${item.number} by ${item.user.login} in ${item.base.repo.name} ${diffDate.value} ${diffDate.unit} ago`,
-        });
-
-        wrapperBox.add_suffix(ctaButton);
-        wrapperBox.add_prefix(avatar);
-
-        this._pullRequests.append(wrapperBox);
       });
     }
 
