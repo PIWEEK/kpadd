@@ -5,6 +5,8 @@ import Soup from "gi://Soup?version=2.4";
 import Adw from "gi://Adw";
 import Gio from "gi://Gio";
 
+import { githubToken } from "./config/config.js";
+
 export const GithubWidget = GObject.registerClass(
   {
     GTypeName: "KpaddGithubWidget",
@@ -28,10 +30,7 @@ export const GithubWidget = GObject.registerClass(
         uri: new Soup.URI(url),
       });
 
-      message.request_headers.append(
-        "Authorization",
-        "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"
-      );
+      message.request_headers.append("Authorization", githubToken);
 
       message.request_headers.append("User-Agent", "Kpadd/0.1");
       message.request_headers.append("Accept", "application/vnd.github+json");
@@ -51,7 +50,7 @@ export const GithubWidget = GObject.registerClass(
           const diffDate = this.getDuration(milli);
 
           const avatar = new Adw.Avatar({
-            text: item.user.login,
+            text: item.base.repo.name,
             show_initials: true,
             size: 32,
           });

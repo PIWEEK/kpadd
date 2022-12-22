@@ -63,7 +63,14 @@ export const TaigaWidget = GObject.registerClass(
       );
 
       session.queue_message(message, (session, message) => {
-        const data = JSON.parse(message.response_body.data);
+        const response = JSON.parse(message.response_body.data);
+
+        const data = response.sort(function (a, b) {
+          const date1 = new Date(a.created_date);
+          const date2 = new Date(b.created_date);
+
+          return date2 - date1;
+        });
 
         this.displayTasks(data);
       });
@@ -79,7 +86,7 @@ export const TaigaWidget = GObject.registerClass(
 
         let ctaButton = new Gtk.LinkButton({
           css_classes: ["flat"],
-          uri: `https://tree.taiga.io/project/${item.project_extra_info.slug}/task/${item.id}`,
+          uri: `https://tree.taiga.io/project/${item.project_extra_info.slug}/issue/${item.ref}`,
           child: new Adw.ButtonContent({
             icon_name: "checkbox-checked-symbolic",
             label: _("Visit"),
